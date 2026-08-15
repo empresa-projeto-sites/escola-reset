@@ -104,60 +104,57 @@
     </footer>
 
     <!-- SCRIPT DE ENVIO GOOGLE SHEETS -->
-    <script>
-        /* Insira aqui o link de implantação da sua Web App do Google Apps Script */
-        const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/SUA_URL_AQUI/exec";
+ <script>
+    /* Cole aqui o seu link de implantação do Apps Script */
+    const URL_GOOGLE_SCRIPT = "https://script.google.com/macros/s/SUA_URL_AQUI/exec";
 
-        const formulario = document.getElementById("contatoForm");
-        const botao = document.getElementById("botaoEnviar");
-        const mensagemStatus = document.getElementById("mensagemStatus");
+    const formulario = document.getElementById("contatoForm");
+    const botao = document.getElementById("botaoEnviar");
+    const mensagemStatus = document.getElementById("mensagemStatus");
 
-        formulario.addEventListener("submit", async function(event) {
-            event.preventDefault();
+    formulario.addEventListener("submit", function(event) {
+        event.preventDefault();
 
-            const dados = {
-                nome: document.getElementById("nome").value.trim(),
-                empresa: document.getElementById("empresa").value.trim(),
-                email: document.getElementById("email").value.trim(),
-                telefone: document.getElementById("telefone").value.trim(),
-                mensagem: document.getElementById("mensagemInput").value.trim()
-            };
+        const dados = {
+            nome: document.getElementById("nome").value.trim(),
+            empresa: document.getElementById("empresa").value.trim(),
+            email: document.getElementById("email").value.trim(),
+            telefone: document.getElementById("telefone").value.trim(),
+            mensagem: document.getElementById("mensagemInput").value.trim()
+        };
 
-            botao.disabled = true;
-            botao.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
+        botao.disabled = true;
+        botao.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
+        mensagemStatus.style.display = "none";
 
-            mensagemStatus.style.display = "none";
+        fetch(URL_GOOGLE_SCRIPT, {
+            method: "POST",
+            mode: "no-cors", // Resolve o bloqueio de política de origem (CORS)
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(dados)
+        })
+        .then(() => {
+            mensagemStatus.style.display = "block";
+            mensagemStatus.style.background = "rgba(40, 120, 60, 0.3)";
+            mensagemStatus.style.border = "1px solid rgba(100, 220, 120, 0.5)";
+            mensagemStatus.style.color = "#b9ffc5";
+            mensagemStatus.innerHTML = "✓ Solicitação enviada com sucesso!<br>Em breve entraremos em contato.";
 
-            try {
-                await fetch(URL_GOOGLE_SCRIPT, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "text/plain;charset=utf-8"
-                    },
-                    body: JSON.stringify(dados)
-                });
-
-                mensagemStatus.style.display = "block";
-                mensagemStatus.style.background = "rgba(40, 120, 60, 0.3)";
-                mensagemStatus.style.border = "1px solid rgba(100, 220, 120, 0.5)";
-                mensagemStatus.style.color = "#b9ffc5";
-                mensagemStatus.innerHTML = "✓ Solicitação enviada com sucesso!<br>Em breve entraremos em contato.";
-
-                formulario.reset();
-
-            } catch (erro) {
-                mensagemStatus.style.display = "block";
-                mensagemStatus.style.background = "rgba(150, 40, 40, 0.3)";
-                mensagemStatus.style.border = "1px solid rgba(255, 100, 100, 0.5)";
-                mensagemStatus.style.color = "#ffbaba";
-                mensagemStatus.innerHTML = "Não foi possível enviar a mensagem.<br>Por favor, tente novamente mais tarde.";
-                console.error(erro);
-            }
-
+            formulario.reset();
+        })
+        .catch((erro) => {
+            mensagemStatus.style.display = "block";
+            mensagemStatus.style.background = "rgba(150, 40, 40, 0.3)";
+            mensagemStatus.style.border = "1px solid rgba(255, 100, 100, 0.5)";
+            mensagemStatus.style.color = "#ffbaba";
+            mensagemStatus.innerHTML = "Não foi possível enviar a mensagem.<br>Por favor, tente novamente mais tarde.";
+            console.error(erro);
+        })
+        .finally(() => {
             botao.disabled = false;
             botao.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Enviar Mensagem';
         });
-    </script>
-
-</body>
-</html>
+    });
+</script>
